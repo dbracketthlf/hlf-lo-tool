@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HLF Income Analyzer · Loan Officer Tool</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--navy:#0c1a2e;--blue:#2563eb;--sky:#0ea5e9;--green:#059669;--amber:#d97706;--red:#dc2626;--white:#fff;--off:#f8f9fc;--slate:#475569;--mist:#94a3b8;--ruled:rgba(12,26,46,0.09);--sh:0 2px 12px rgba(12,26,46,0.08);--shl:0 8px 32px rgba(12,26,46,0.14)}
+html{scroll-behavior:smooth}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--off);color:var(--navy);min-height:100vh}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#0c1a2e,#0f2545)}
+.login-box{background:#fff;border-radius:20px;padding:44px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(12,26,46,0.35);text-align:center}
+.login-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--blue),var(--sky));display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-size:22px;box-shadow:0 4px 16px rgba(37,99,235,0.3)}
+.login-title{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.5px;margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--mist);margin-bottom:28px;line-height:1.5}
+.login-input{width:100%;padding:12px 14px;border:1.5px solid var(--ruled);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:var(--navy);outline:none;margin-bottom:10px;transition:border-color .2s}
+.login-input:focus{border-color:var(--blue)}
+.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff;border:none;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(37,99,235,0.25)}
+.login-btn:hover{opacity:.9;transform:translateY(-1px)}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;display:none}
+
+/* APP */
+.app{display:none;min-height:100vh;flex-direction:column}
+
+/* NAV */
+.nav{background:var(--navy);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(12,26,46,0.3)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-logo{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue),var(--sky));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff}
+.nav-title{font-size:14px;font-weight:700;color:#fff;letter-spacing:-.3px}
+.nav-sub{font-size:9px;color:rgba(255,255,255,0.4);font-family:'DM Mono',monospace;letter-spacing:.5px}
+.nav-links{display:flex;align-items:center;gap:6px}
+.nav-link{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.65);text-decoration:none;transition:all .2s}
+.nav-link:hover,.nav-link.active{background:rgba(255,255,255,0.1);color:#fff}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-lo{font-size:11px;color:rgba(255,255,255,0.45);font-family:'DM Mono',monospace}
+.nav-logout{padding:6px 14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s}
+.nav-logout:hover{background:rgba(255,255,255,0.15)}
+
+/* MAIN */
+.main{flex:1;padding:28px;max-width:1200px;margin:0 auto;width:100%}
+
+/* STEP HEADER */
+.page-title{font-size:26px;font-weight:900;color:var(--navy);letter-spacing:-.8px;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--mist);margin-bottom:24px}
+
+/* SETUP CARD */
+.setup-card{background:#fff;border-radius:16px;padding:24px;border:1.5px solid var(--ruled);box-shadow:var(--sh);margin-bottom:20px}
+.setup-card h3{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px;letter-spacing:-.2px}
+.setup-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:10px;font-weight:700;color:var(--slate);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase}
+.form-input{padding:10px 12px;border:1.5px solid var(--ruled);border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--navy);outline:none;background:#fff;transition:border-color .2s}
+.form-input:focus{border-color:var(--blue)}
+.form-select{padding:10px 12px;border:1.5px solid var(--ruled);border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--navy);outline:none;background:#fff;cursor:pointer;transition:border-color .2s}
+.form-select:focus{border-color:var(--blue)}
+
+/* LOAN TYPE PILLS */
+.loan-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:0}
+.loan-pill{padding:9px 18px;border-radius:20px;border:1.5px solid var(--ruled);background:#fff;color:var(--slate);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif}
+.loan-pill:hover{border-color:var(--blue);color:var(--blue);background:rgba(37,99,235,0.04)}
+.loan-pill.active{background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff;border-color:transparent;box-shadow:0 2px 8px rgba(37,99,235,0.25)}
+
+/* NON-QM SUB OPTIONS */
+.nonqm-opts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--ruled)}
+.nonqm-opt{padding:7px 14px;border-radius:16px;border:1.5px solid var(--ruled);background:#fff;color:var(--slate);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Plus Jakarta Sans',sans-serif}
+.nonqm-opt:hover{border-color:var(--amber);color:var(--amber)}
+.nonqm-opt.active{background:rgba(217,119,6,0.1);color:var(--amber);border-color:rgba(217,119,6,0.3)}
+
+/* UPLOAD */
+.upload-card{background:#fff;border-radius:16px;padding:24px;border:1.5px solid var(--ruled);box-shadow:var(--sh);margin-bottom:20px}
+.upload-zone{border:2px dashed rgba(37,99,235,0.2);border-radius:12px;padding:36px 20px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(37,99,235,0.02);position:relative}
+.upload-zone:hover,.upload-zone.over{border-color:var(--blue);background:rgba(37,99,235,0.05)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:32px;margin-bottom:10px}
+.upload-title{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.upload-sub{font-size:12px;color:var(--mist)}
+.pills-wrap{display:flex;flex-direction:column;gap:6px;margin-top:14px}
+.file-pill{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--off);border:1px solid var(--ruled);border-radius:9px;font-size:12px;animation:slideIn .2s ease}
+@keyframes slideIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.file-pill span{flex:1;font-weight:500;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-pill small{font-family:'DM Mono',monospace;font-size:10px;color:var(--mist)}
+.file-pill button{background:none;border:none;cursor:pointer;color:var(--mist);font-size:12px;padding:2px 4px;transition:color .15s;border-radius:4px}
+.file-pill button:hover{color:var(--red);background:rgba(220,38,38,0.08)}
+
+/* ANALYZE BUTTON */
+.analyze-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--blue),var(--sky));color:#fff;border:none;border-radius:12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(37,99,235,0.3);letter-spacing:-.2px;display:flex;align-items:center;justify-content:center;gap:10px}
+.analyze-btn:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 8px 24px rgba(37,99,235,0.35)}
+.analyze-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+/* RESULTS */
+.results-wrap{display:none}
+.result-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.result-title{font-size:18px;font-weight:800;color:var(--navy);letter-spacing:-.5px}
+.result-actions{display:flex;gap:8px}
+.btn{padding:9px 18px;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:none}
+.btn-print{background:linear-gradient(135deg,var(--navy),#1e3a5f);color:#fff;box-shadow:0 2px 8px rgba(12,26,46,0.2)}
+.btn-print:hover{opacity:.9;transform:translateY(-1px)}
+.btn-new{background:#fff;color:var(--slate);border:1.5px solid var(--ruled)}
+.btn-new:hover{border-color:var(--blue);color:var(--blue)}
+
+/* INCOME WORKSHEET */
+.worksheet{background:#fff;border-radius:16px;border:1.5px solid var(--ruled);overflow:hidden;box-shadow:var(--shl)}
+.ws-header{background:var(--navy);padding:24px 28px;position:relative;overflow:hidden}
+.ws-header::after{content:'INCOME ANALYSIS';position:absolute;top:50%;right:-10px;transform:translateY(-50%);font-size:60px;font-weight:900;color:rgba(255,255,255,0.04);letter-spacing:4px;white-space:nowrap;pointer-events:none}
+.ws-co{font-size:16px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.ws-co-sub{font-size:10px;color:rgba(255,255,255,0.45);font-family:'DM Mono',monospace;letter-spacing:.5px;margin-top:2px}
+.ws-meta{margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.ws-meta-item{}
+.ws-meta-lbl{font-size:8px;color:rgba(255,255,255,0.4);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:3px}
+.ws-meta-val{font-size:13px;font-weight:700;color:#fff}
+.ws-total-bar{background:linear-gradient(135deg,rgba(5,150,105,0.15),rgba(14,165,233,0.08));padding:20px 28px;border-bottom:1px solid var(--ruled);display:flex;align-items:center;justify-content:space-between}
+.ws-total-lbl{font-size:11px;font-weight:700;color:var(--slate);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase}
+.ws-total-val{font-size:36px;font-weight:900;color:var(--green);letter-spacing:-1.5px}
+.ws-total-sub{font-size:12px;color:var(--mist);margin-top:2px}
+.ws-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:10px;font-weight:700;font-family:'DM Mono',monospace;letter-spacing:.8px;text-transform:uppercase}
+.ws-badge-blue{background:rgba(37,99,235,0.1);color:var(--blue);border:1px solid rgba(37,99,235,0.2)}
+
+/* INCOME SECTIONS */
+.ws-section{padding:20px 28px;border-bottom:1px solid var(--ruled)}
+.ws-section:last-child{border-bottom:none}
+.ws-section-title{font-size:11px;font-weight:700;color:var(--slate);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ws-section-title::after{content:'';flex:1;height:1px;background:var(--ruled)}
+.income-table{width:100%;border-collapse:collapse}
+.income-table th{font-size:8px;font-weight:700;color:var(--mist);font-family:'DM Mono',monospace;letter-spacing:1.2px;text-transform:uppercase;padding:6px 10px;text-align:left;border-bottom:1.5px solid var(--ruled);background:var(--off)}
+.income-table td{padding:10px 10px;font-size:13px;border-bottom:1px solid var(--ruled);vertical-align:top}
+.income-table tr:last-child td{border-bottom:none}
+.income-table .td-label{font-weight:600;color:var(--navy);max-width:240px}
+.income-table .td-calc{font-family:'DM Mono',monospace;font-size:11px;color:var(--slate)}
+.income-table .td-amount{font-weight:700;color:var(--navy);font-family:'DM Mono',monospace;text-align:right;white-space:nowrap}
+.income-table .td-amount.green{color:var(--green)}
+.income-table .td-amount.red{color:var(--red)}
+.income-table .td-note{font-size:11px;color:var(--mist);font-style:italic}
+.subtotal-row td{background:rgba(37,99,235,0.04);font-weight:700;border-top:2px solid rgba(37,99,235,0.15)}
+.grand-total-row td{background:rgba(5,150,105,0.06);border-top:2px solid rgba(5,150,105,0.2);font-size:15px}
+
+/* NOTES SECTION */
+.ws-notes{padding:20px 28px;background:var(--off);border-top:1px solid var(--ruled)}
+.ws-notes-title{font-size:10px;font-weight:700;color:var(--slate);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.ws-notes-body{font-size:12px;color:var(--slate);line-height:1.75;white-space:pre-line}
+.ws-docs{margin-top:14px;padding-top:14px;border-top:1px solid var(--ruled)}
+.ws-docs-title{font-size:10px;font-weight:700;color:var(--slate);font-family:'DM Mono',monospace;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px}
+.ws-doc-item{font-size:11px;color:var(--mist);padding:2px 0;display:flex;align-items:center;gap:6px}
+.ws-footer{padding:16px 28px;border-top:1px solid var(--ruled);display:flex;justify-content:space-between;align-items:center;background:#fff}
+.ws-footer-left{font-size:10px;color:var(--mist);font-family:'DM Mono',monospace;line-height:1.6}
+.ws-footer-right{font-size:10px;color:var(--mist);font-family:'DM Mono',monospace;text-align:right}
+.ws-disclaimer{font-size:9px;color:var(--mist);padding:12px 28px;background:var(--off);border-top:1px solid var(--ruled);text-align:center;line-height:1.6}
+
+/* LOADING */
+.loading-wrap{text-align:center;padding:60px 20px}
+.loading-icon{font-size:44px;animation:pulse 1.5s ease-in-out infinite;margin-bottom:16px}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.7}}
+.loading-title{font-size:18px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.loading-steps{display:flex;flex-direction:column;gap:6px;max-width:380px;margin:16px auto 0}
+.loading-step{font-size:12px;color:var(--mist);padding:7px 14px;background:#fff;border-radius:8px;border:1px solid var(--ruled);text-align:left;opacity:.4;transition:all .4s}
+.loading-step.active{opacity:1;color:var(--navy);font-weight:600;border-color:var(--blue);background:rgba(37,99,235,0.04)}
+.loading-step.done{opacity:.7;color:var(--green)}
+
+/* PRINT */
+@media print{
+  .nav,.analyze-btn,.result-actions,.login-wrap,.upload-card,.setup-card,.results-wrap .result-topbar{display:none!important}
+  .app{display:block!important}
+  .main{padding:0!important;max-width:100%!important}
+  .results-wrap{display:block!important}
+  body{background:#fff}
+  .worksheet{box-shadow:none;border:none}
+  .ws-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .ws-total-bar{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .setup-grid{grid-template-columns:1fr 1fr}
+  .ws-meta{grid-template-columns:1fr 1fr}
+  .main{padding:16px}
+}
+@media(max-width:600px){
+  .setup-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">📊</div>
+    <div class="login-title">HLF Income Analyzer</div>
+    <div class="login-sub">Loan Officer Internal Tool · Homeland Financial Network, Inc.<br>NMLS #390249</div>
+    <input type="text" class="login-input" id="loName" placeholder="Your name (e.g. David Brackett)" autocomplete="off">
+    <input type="password" class="login-input" id="pwdInput" placeholder="LO tool password" onkeydown="if(event.key==='Enter')login()">
+    <button class="login-btn" onclick="login()">Sign In →</button>
+    <div class="login-err" id="loginErr">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appWrap">
+  <nav class="nav">
+    <div class="nav-brand">
+      <div class="nav-logo">H</div>
+      <div>
+        <div class="nav-title">HLF Income Analyzer</div>
+        <div class="nav-sub">INTERNAL · NMLS #390249</div>
+      </div>
+    </div>
+    <div class="nav-links">
+      <a href="/index.html" class="nav-link active">📊 Income Analyzer</a>
+      <a href="/guidelines.html" class="nav-link">💬 Guidelines Bot</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-lo" id="navLoName"></div>
+      <button class="nav-logout" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <!-- SETUP + UPLOAD -->
+    <div id="inputSection">
+      <div class="page-title">Income Analysis Worksheet</div>
+      <div class="page-sub">Upload borrower income documents · AI calculates qualifying income per agency guidelines · Print for underwriter</div>
+
+      <!-- STEP 1: LOAN SETUP -->
+      <div class="setup-card">
+        <h3>📋 Step 1 — Loan Information</h3>
+        <div class="setup-grid" style="margin-bottom:16px">
+          <div class="form-group">
+            <label>Borrower Name</label>
+            <input type="text" class="form-input" id="borrowerName" placeholder="First Last">
+          </div>
+          <div class="form-group">
+            <label>Co-Borrower Name (if any)</label>
+            <input type="text" class="form-input" id="coBorrowerName" placeholder="Optional">
+          </div>
+          <div class="form-group">
+            <label>Loan Number / File ID</label>
+            <input type="text" class="form-input" id="loanNumber" placeholder="e.g. HLF-2026-001">
+          </div>
+          <div class="form-group">
+            <label>Subject Property Address</label>
+            <input type="text" class="form-input" id="propertyAddress" placeholder="Optional">
+          </div>
+          <div class="form-group">
+            <label>Proposed PITIA ($/mo)</label>
+            <input type="number" class="form-input" id="proposedPITIA" placeholder="e.g. 3500" min="0">
+          </div>
+          <div class="form-group">
+            <label>Analysis Date</label>
+            <input type="date" class="form-input" id="analysisDate">
+          </div>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:10px;font-weight:700;color:var(--slate);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:8px">Loan Type</label>
+          <div class="loan-pills" id="loanPills">
+            <button class="loan-pill active" onclick="setLoanType('CONV',this)">Conventional</button>
+            <button class="loan-pill" onclick="setLoanType('FHA',this)">FHA</button>
+            <button class="loan-pill" onclick="setLoanType('VA',this)">VA</button>
+            <button class="loan-pill" onclick="setLoanType('JUMBO',this)">Jumbo</button>
+            <button class="loan-pill" onclick="setLoanType('NON-QM',this)">Non-QM</button>
+          </div>
+          <div class="nonqm-opts" id="nonqmOpts" style="display:none">
+            <label style="font-size:10px;font-weight:700;color:var(--amber);font-family:'DM Mono',monospace;letter-spacing:1px;text-transform:uppercase;width:100%;margin-bottom:0">Non-QM Doc Type:</label>
+            <button class="nonqm-opt active" onclick="setNonQMType('12mo-personal',this)">12-Mo Personal Bank Stmts</button>
+            <button class="nonqm-opt" onclick="setNonQMType('24mo-personal',this)">24-Mo Personal Bank Stmts</button>
+            <button class="nonqm-opt" onclick="setNonQMType('12mo-business',this)">12-Mo Business Bank Stmts</button>
+            <button class="nonqm-opt" onclick="setNonQMType('24mo-business',this)">24-Mo Business Bank Stmts</button>
+            <button class="nonqm-opt" onclick="setNonQMType('dscr',this)">DSCR (Rental Income Only)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: UPLOAD -->
+      <div class="upload-card">
+        <h3 style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:8px">📎 Step 2 — Upload Income Documents</h3>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" multiple accept=".pdf,.jpg,.jpeg,.png,.webp" onchange="onFiles(event)">
+          <div class="upload-icon">📤</div>
+          <div class="upload-title">Drop files here or click to browse</div>
+          <div class="upload-sub">W-2s · 1040s · Pay Stubs · 1099s · Schedule C/E/K-1 · Bank Statements · Lease Agreements<br>PDF or image · Multiple files OK</div>
+        </div>
+        <div class="pills-wrap" id="pillsWrap"></div>
+      </div>
+
+      <!-- ANALYZE -->
+      <button class="analyze-btn" id="analyzeBtn" onclick="runAnalysis()">
+        <span>⚡</span> Analyze Income Documents
+      </button>
+    </div>
+
+    <!-- LOADING -->
+    <div id="loadingSection" style="display:none">
+      <div class="loading-wrap">
+        <div class="loading-icon">🔍</div>
+        <div class="loading-title">Analyzing Income Documents</div>
+        <div style="font-size:13px;color:var(--mist);margin-bottom:4px">AI is reading your documents and applying agency guidelines</div>
+        <div class="loading-steps">
+          <div class="loading-step active" id="ls1">📄 Reading and extracting data from documents…</div>
+          <div class="loading-step" id="ls2">🧮 Identifying income sources and types…</div>
+          <div class="loading-step" id="ls3">📊 Applying <span id="lsLoanType">agency</span> income guidelines…</div>
+          <div class="loading-step" id="ls4">✅ Calculating add-backs, adjustments, and totals…</div>
+          <div class="loading-step" id="ls5">📋 Generating income worksheet…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results-wrap" id="resultsSection">
+      <div class="result-topbar">
+        <div class="result-title">Income Analysis Complete</div>
+        <div class="result-actions">
+          <button class="btn btn-new" onclick="startOver()">← New Analysis</button>
+          <button class="btn btn-print" onclick="window.print()">🖨️ Print Worksheet</button>
+        </div>
+      </div>
+      <div class="worksheet" id="worksheet"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var PWD = '';
+var LO_NAME = '';
+var LOAN_TYPE = 'CONV';
+var NONQM_TYPE = '12mo-personal';
+var FILES = [];
+
+// ── AUTH
+function login() {
+  var name = document.getElementById('loName').value.trim();
+  var pwd = document.getElementById('pwdInput').value;
+  if (!name) { document.getElementById('loName').style.borderColor = 'var(--red)'; return; }
+
+  // Quick verify by making a test API call structure
+  fetch('/api/lo', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      pwd: pwd,
+      messages: [{ role:'user', content:'ping' }],
+      max_tokens: 5
+    })
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if (data.error === 'Unauthorized') {
+      document.getElementById('loginErr').style.display = 'block';
+    } else {
+      PWD = pwd; LO_NAME = name;
+      sessionStorage.setItem('hlf_lo_pwd', pwd);
+      sessionStorage.setItem('hlf_lo_name', name);
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('appWrap').style.display = 'flex';
+      document.getElementById('navLoName').textContent = name;
+      document.getElementById('analysisDate').value = new Date().toISOString().split('T')[0];
+    }
+  })
+  .catch(function(){
+    // If function not found yet, allow login for setup
+    PWD = pwd; LO_NAME = name;
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('appWrap').style.display = 'flex';
+    document.getElementById('navLoName').textContent = name;
+    document.getElementById('analysisDate').value = new Date().toISOString().split('T')[0];
+  });
+}
+
+function logout() {
+  sessionStorage.removeItem('hlf_lo_pwd');
+  sessionStorage.removeItem('hlf_lo_name');
+  PWD = ''; LO_NAME = '';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('appWrap').style.display = 'none';
+}
+
+window.addEventListener('load', function(){
+  var sp = sessionStorage.getItem('hlf_lo_pwd');
+  var sn = sessionStorage.getItem('hlf_lo_name');
+  if (sp && sn) {
+    document.getElementById('pwdInput').value = sp;
+    document.getElementById('loName').value = sn;
+    login();
+  }
+});
+
+// ── LOAN TYPE
+function setLoanType(type, btn) {
+  LOAN_TYPE = type;
+  document.querySelectorAll('.loan-pill').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('nonqmOpts').style.display = type === 'NON-QM' ? 'flex' : 'none';
+  document.getElementById('ls3').querySelector('span').textContent = {
+    'CONV':'Conventional / Fannie Mae','FHA':'FHA / HUD','VA':'VA / VA Handbook',
+    'JUMBO':'Jumbo / Portfolio','NON-QM':'Non-QM / Alternative'
+  }[type] || 'agency';
+}
+
+function setNonQMType(type, btn) {
+  NONQM_TYPE = type;
+  document.querySelectorAll('.nonqm-opt').forEach(function(p){ p.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+// ── FILES
+function onFiles(e) {
+  Array.from(e.target.files).forEach(function(f){
+    if (!FILES.find(function(x){ return x.name===f.name && x.size===f.size; })) FILES.push(f);
+  });
+  renderPills(); e.target.value = '';
+}
+
+var uz = document.getElementById('uploadZone');
+uz.addEventListener('dragover', function(e){ e.preventDefault(); uz.classList.add('over'); });
+uz.addEventListener('dragleave', function(){ uz.classList.remove('over'); });
+uz.addEventListener('drop', function(e){
+  e.preventDefault(); uz.classList.remove('over');
+  Array.from(e.dataTransfer.files).forEach(function(f){
+    if (!FILES.find(function(x){ return x.name===f.name; })) FILES.push(f);
+  });
+  renderPills();
+});
+
+function renderPills() {
+  var wrap = document.getElementById('pillsWrap'); wrap.innerHTML = '';
+  FILES.forEach(function(f,i){
+    var icon = f.name.toLowerCase().endsWith('.pdf') ? '📑' : '🖼️';
+    var sz = f.size>1048576?(f.size/1048576).toFixed(1)+'MB':Math.round(f.size/1024)+'KB';
+    var d = document.createElement('div'); d.className = 'file-pill';
+    d.innerHTML = '<span style="font-size:16px">'+icon+'</span><span>'+f.name+'</span><small>'+sz+'</small><button onclick="rmFile('+i+')">✕</button>';
+    wrap.appendChild(d);
+  });
+}
+
+function rmFile(i) { FILES.splice(i,1); renderPills(); }
+
+function toB64(file) {
+  return new Promise(function(r,j){
+    var rd = new FileReader();
+    rd.onload = function(){ r(rd.result.split(',')[1]); };
+    rd.onerror = j; rd.readAsDataURL(file);
+  });
+}
+
+// ── LOADING ANIMATION
+var loadingTimer;
+function startLoading() {
+  var steps = ['ls1','ls2','ls3','ls4','ls5'];
+  var i = 0;
+  steps.forEach(function(s){ document.getElementById(s).className = 'loading-step'; });
+  document.getElementById('ls1').className = 'loading-step active';
+  document.getElementById('lsLoanType').textContent = {
+    'CONV':'Conventional/Fannie Mae','FHA':'FHA/HUD','VA':'VA Handbook',
+    'JUMBO':'Jumbo/Portfolio','NON-QM':'Non-QM'
+  }[LOAN_TYPE] || 'agency';
+  loadingTimer = setInterval(function(){
+    if (i < steps.length - 1) {
+      document.getElementById(steps[i]).className = 'loading-step done';
+      i++;
+      document.getElementById(steps[i]).className = 'loading-step active';
+    }
+  }, 4000);
+}
+
+function stopLoading() { clearInterval(loadingTimer); }
+
+// ── BUILD SYSTEM PROMPT
+function buildSystemPrompt() {
+  var loanGuide = {
+    'CONV': `You are an expert mortgage income analyst following Fannie Mae (FNMA) and Freddie Mac (FHLMC) conventional loan guidelines.
+
+CONVENTIONAL INCOME CALCULATION RULES:
+W-2/Salary:
+- Base salary: annualize most recent pay stub base pay (hourly × hours × 52 or salary ÷ pay periods × 26 biweekly etc.)
+- Overtime/bonus/commission: 2-year average REQUIRED if less than 24 months consistent history. If declining, use lower year or exclude.
+- Part-time: 2-year history required at same employer
+- Second job: 2-year continuous history required
+
+Self-Employed (owns 25%+ of business):
+- Sole Proprietor (Schedule C): 2-year average net profit + add-backs (depreciation, depletion, business use of home, amortization, non-recurring losses)
+- S-Corporation (1120-S/K-1): W-2 wages paid + proportional share of ordinary income/loss × ownership % + add-backs (depreciation, amortization, non-recurring losses)
+- Partnership (1065/K-1): proportional share × ownership % + add-backs
+- C-Corporation: W-2 wages only (dividends not eligible unless documented 2+ years)
+- Business income declining >25% year-over-year: may be excluded or averaged with lower year
+- YTD P&L required if fiscal year ends before current date
+- CPA letter or business license required
+
+Rental Income (Schedule E):
+- Method 1: Schedule E net rental income + depreciation add-back, averaged 2 years
+- Method 2: 75% of gross lease/rental agreement minus PITIA on rental property
+- Use lower of the two if investment property not yet on tax returns
+- Vacancy factor: 25% applied to gross rents if using lease agreement method
+
+Other income:
+- Social Security/pension/disability: gross up 25% if non-taxable
+- Alimony: 3+ years continuance documentation required
+- Child support: 3+ years continuance required
+- Capital gains: 2-year average if recurring and documented
+- Interest/dividend: 2-year average from tax returns
+
+DTI maximums: 45% back-end (up to 50% with compensating factors in DU)
+Documentation: 30 days pay stubs, 2 years W-2s, 2 years 1040s for self-employed`,
+
+    'FHA': `You are an expert mortgage income analyst following FHA/HUD guidelines (HUD Handbook 4000.1).
+
+FHA INCOME CALCULATION RULES:
+W-2/Salary:
+- Base salary: annualize from most recent pay stub
+- Overtime/bonus: 2-year history preferred, 1-year acceptable with strong documentation
+- Part-time: 1-year history at same employer acceptable
+- Recent job change: acceptable if same field, no gap over 30 days
+
+Self-Employed:
+- 2 years self-employment history required (exception: 1 year if same field as prior W-2)
+- Schedule C: 2-year average net profit + add-backs
+- S-Corp/Partnership: same as conventional
+- Business P&L required if returns over 120 days old
+
+Rental Income:
+- Current rental income from property borrower is vacating: 75% of rental agreement
+- Investment properties: Schedule E method (2-year average net + depreciation)
+- New rental income not on tax returns: 75% of lease agreement minus PITIA
+
+Non-taxable income: gross up 25% (SS disability, military allowances, etc.)
+Child support/alimony: 3 years continuance
+
+DTI: 31% front-end / 43% back-end guideline. Up to 50% with AUS approval and compensating factors.
+FHA max DTI note: Manual underwriting caps at 31/43; AUS can approve up to 50%+ with strong compensating factors.
+
+Documentation: 30 days pay stubs, 2 years W-2s, 2 years 1040s`,
+
+    'VA': `You are an expert mortgage income analyst following VA Lender Handbook (VA Pamphlet 26-7) guidelines.
+
+VA INCOME CALCULATION RULES:
+Primary analysis is RESIDUAL INCOME — not just DTI.
+
+Effective Income Sources:
+- Base pay: most recent base salary (annualized)
+- Military: base pay + BAH + BAS (BAH and BAS are non-taxable — gross up 25%)
+- Overtime/bonus: 2-year average if consistent and employer confirms likelihood of continuation
+- Part-time: 2-year history at same employer
+
+Self-Employed:
+- 2-year history required
+- Schedule C: 2-year average net + add-backs (depreciation, depletion)
+- S-Corp/K-1: proportional income + W-2 + add-backs
+- YTD P&L if returns more than 4 months old
+
+Rental Income:
+- Net rental income from Schedule E (2-year average + depreciation add-back)
+- Subject property rental: not counted unless converting primary to rental with 30% equity documented
+- 75% of gross lease for new rentals
+
+Residual Income Requirements (must meet after all debts):
+- Northeast: 1 person $390, 2 $654, 3 $788, 4 $888, 5 $921, each add'l $75
+- Midwest: 1 $382, 2 $641, 3 $772, 4 $868, 5 $902
+- South: 1 $362, 2 $606, 3 $729, 4 $823, 5 $855
+- West: 1 $425, 2 $713, 3 $859, 4 $967, 5 $1,004
+(California = West region)
+
+DTI: 41% guideline. Over 41% requires compensating factors + residual income 120% of requirement.
+No down payment required. No PMI. Funding fee varies.
+
+Non-taxable income: always gross up 25%`,
+
+    'JUMBO': `You are an expert mortgage income analyst for Jumbo/Non-Conforming portfolio loans.
+
+JUMBO INCOME CALCULATION RULES (general portfolio guidelines — may vary by lender):
+Documentation requirements are MORE stringent than conventional:
+- 24 months complete federal tax returns (all schedules) required
+- 12 months reserves (PITIA × 12) typically required
+- CPA letter for self-employed REQUIRED
+- Business bank statements 12-24 months often required for SE borrowers
+
+W-2/Salary:
+- Base: annualized from pay stubs
+- OT/bonus/commission: 2-year average, documented with employer verification
+- RSU/stock: 2-year vesting history, continued employment confirmed
+
+Self-Employed:
+- 2-year average Schedule C net + add-backs
+- S-Corp: W-2 + K-1 proportional income + add-backs
+- Declining income: use lower of 2 years; >25% decline may disqualify
+- Year-to-date P&L signed by CPA required
+
+Rental Income:
+- Schedule E 2-year average + depreciation add-back
+- Large portfolios: may require lease agreements for all properties
+- DSCR analysis may be required for large investment portfolios
+
+Asset Depletion (some jumbo lenders):
+- Eligible assets ÷ loan term (months) = qualifying income
+- Typically 70% of eligible assets counted (after 30% market risk haircut)
+- Retirement accounts: 60-70% eligible if borrower ≥59.5
+
+DTI: typically 43-45% maximum. Some lenders allow up to 50% with strong assets.
+
+Note: Jumbo guidelines vary significantly by lender/investor. These are representative guidelines.`,
+
+    'NON-QM': `You are an expert mortgage income analyst for Non-QM alternative documentation loans.`
+  };
+
+  var nonQMGuide = {
+    '12mo-personal': `
+NON-QM 12-MONTH PERSONAL BANK STATEMENT INCOME:
+- Review 12 consecutive months of personal bank statements
+- Calculate total deposits for all 12 months
+- EXCLUDE: transfers between accounts, loan proceeds, insurance payouts, tax refunds, non-recurring deposits
+- INCLUDE: regular business/income deposits, ACH transfers from business
+- Expense factor: personal statements typically use 100% of deposits (borrower responsible for business expenses separately)
+- Qualifying income = Total eligible deposits ÷ 12 months
+- Large non-recurring deposits must be explained and excluded
+- Document source of all deposits over $X threshold (typically $5,000)`,
+
+    '24mo-personal': `
+NON-QM 24-MONTH PERSONAL BANK STATEMENT INCOME:
+- Review 24 consecutive months of personal bank statements
+- Calculate total eligible deposits over 24 months
+- EXCLUDE: transfers, loan proceeds, insurance, tax refunds, non-recurring items
+- Qualifying income = Total eligible deposits ÷ 24 months
+- 24-month average typically more favorable for seasonal businesses
+- Document and exclude all non-income deposits`,
+
+    '12mo-business': `
+NON-QM 12-MONTH BUSINESS BANK STATEMENT INCOME:
+- Review 12 consecutive months of BUSINESS bank statements
+- Calculate total gross deposits for all 12 months
+- Apply EXPENSE FACTOR to account for business operating costs:
+  * Default expense factor: 50% (qualifying income = deposits × 50%)
+  * Lender may accept CPA-prepared P&L to use actual expense ratio
+  * If P&L shows expense ratio <50%, may use actual (e.g., 35% expenses = 65% income factor)
+  * If P&L shows expense ratio >50%, use actual higher expense factor
+- Qualifying income = (Total deposits × income factor) ÷ 12
+- EXCLUDE: loan proceeds, transfers between owned accounts, merchant returns, non-revenue deposits
+- Ownership: must own 50%+ of business
+- Business license and/or CPA letter required`,
+
+    '24mo-business': `
+NON-QM 24-MONTH BUSINESS BANK STATEMENT INCOME:
+- Review 24 consecutive months of BUSINESS bank statements
+- Apply expense factor (default 50% or CPA P&L actual ratio)
+- Qualifying income = (Total eligible deposits × income factor) ÷ 24
+- Detailed documentation of excluded items required
+- CPA letter strongly recommended`,
+
+    'dscr': `
+DSCR (DEBT SERVICE COVERAGE RATIO) LOAN — NO PERSONAL INCOME USED:
+- Personal income is COMPLETELY IRRELEVANT for DSCR loans
+- Qualification is based ENTIRELY on the subject property's rental income vs. PITIA
+
+DSCR Calculation:
+- Gross Monthly Rent (from lease agreement or market rent appraisal)
+- PITIA = Principal + Interest + Taxes + Insurance + HOA (if applicable)
+- DSCR = Gross Monthly Rent ÷ PITIA
+- DSCR ≥ 1.25 = Strong (typically best pricing)
+- DSCR ≥ 1.0 = Eligible (most lenders)
+- DSCR 0.75-0.99 = May be eligible with higher down payment/rate
+- DSCR < 0.75 = Typically ineligible
+
+Income Documentation for DSCR:
+- Current executed lease agreement OR
+- Appraiser's market rent opinion (Form 1007) for vacant property
+- 12 months rental history (bank statements showing rental deposits) preferred
+
+Note: Calculate the DSCR ratio. Show gross rent, PITIA breakdown, and resulting ratio.
+Do NOT calculate personal qualifying income for DSCR loans.`
+  };
+
+  var guide = loanGuide[LOAN_TYPE] || loanGuide['CONV'];
+  if (LOAN_TYPE === 'NON-QM') guide += nonQMGuide[NONQM_TYPE] || nonQMGuide['12mo-personal'];
+
+  return guide + `
+
+OUTPUT FORMAT — CRITICAL:
+Return a single valid JSON object only. No markdown. No backticks. Raw JSON.
+
+Schema:
+{
+  "borrowerName": "string — from documents or use provided name",
+  "loanType": "${LOAN_TYPE}",
+  "nonQMType": "${NONQM_TYPE}",
+  "documentsReviewed": ["list of document names/types identified"],
+  "incomeSources": [
+    {
+      "sourceType": "W-2 Salary|Self-Employed Schedule C|Rental Income|Bank Statement|DSCR|Other",
+      "employerOrSource": "name",
+      "incomeItems": [
+        {
+          "label": "description of this line item",
+          "year1Amount": 0,
+          "year1Label": "2024 or '12-month period' etc",
+          "year2Amount": 0,
+          "year2Label": "2023 etc",
+          "calculation": "show the math: how you got to the monthly amount",
+          "monthlyAmount": 0,
+          "notes": "any guideline notes or warnings",
+          "included": true
+        }
+      ],
+      "subtotalMonthly": 0,
+      "notes": "any important notes about this income source"
+    }
+  ],
+  "rentalProperties": [
+    {
+      "address": "property address if identifiable",
+      "grossRent": 0,
+      "pitia": 0,
+      "netRentalIncome": 0,
+      "dscrRatio": 0,
+      "method": "Schedule E|Lease Agreement|Market Rent",
+      "calculation": "show the math"
+    }
+  ],
+  "totalQualifyingMonthlyIncome": 0,
+  "totalQualifyingAnnualIncome": 0,
+  "proposedPITIA": 0,
+  "frontEndDTI": 0,
+  "backEndDTI": 0,
+  "underwriterNotes": "important observations, warnings, or guideline flags the underwriter should know. Be specific and cite guideline basis.",
+  "incomeFlags": ["list of any income items that need attention, documentation, or UW review"],
+  "dscrRatio": 0
+}`;
+}
+
+// ── RUN ANALYSIS
+async function runAnalysis() {
+  var borrower = document.getElementById('borrowerName').value.trim();
+  if (!borrower) { document.getElementById('borrowerName').style.borderColor='var(--red)'; return; }
+  if (!FILES.length) { alert('Please upload at least one income document.'); return; }
+
+  document.getElementById('inputSection').style.display = 'none';
+  document.getElementById('loadingSection').style.display = 'block';
+  document.getElementById('resultsSection').style.display = 'none';
+  startLoading();
+
+  try {
+    var blocks = [];
+    for (var i = 0; i < FILES.length; i++) {
+      var f = FILES[i], b64 = await toB64(f);
+      var isPDF = f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf');
+      blocks.push(isPDF
+        ? { type:'document', source:{ type:'base64', media_type:'application/pdf', data:b64 } }
+        : { type:'image', source:{ type:'base64', media_type:f.type||'image/jpeg', data:b64 } });
+    }
+
+    blocks.push({ type:'text', text: [
+      'LOAN OFFICER: ' + LO_NAME,
+      'BORROWER: ' + document.getElementById('borrowerName').value,
+      'CO-BORROWER: ' + (document.getElementById('coBorrowerName').value||'None'),
+      'LOAN NUMBER: ' + (document.getElementById('loanNumber').value||'N/A'),
+      'LOAN TYPE: ' + LOAN_TYPE + (LOAN_TYPE==='NON-QM'?' — '+NONQM_TYPE:''),
+      'PROPOSED PITIA: $' + (document.getElementById('proposedPITIA').value||'0'),
+      'PROPERTY: ' + (document.getElementById('propertyAddress').value||'Not provided'),
+      '',
+      'Analyze all attached income documents per agency guidelines.',
+      'Show all calculations. Flag any items needing underwriter attention.'
+    ].join('\n') });
+
+    var resp = await fetch('/api/lo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        pwd: PWD,
+        model: 'claude-sonnet-4-6',
+        max_tokens: 3000,
+        system: buildSystemPrompt(),
+        messages: [{ role:'user', content: blocks }]
+      })
+    });
+
+    stopLoading();
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error.message || JSON.stringify(data.error));
+    var raw = (data.content||[]).map(function(b){ return b.text||''; }).join('');
+    var match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('No JSON in response');
+    renderWorksheet(JSON.parse(match[0]));
+
+  } catch(err) {
+    stopLoading();
+    document.getElementById('loadingSection').style.display = 'none';
+    document.getElementById('inputSection').style.display = 'block';
+    alert('Error: ' + err.message);
+  }
+}
+
+// ── RENDER WORKSHEET
+function renderWorksheet(d) {
+  document.getElementById('loadingSection').style.display = 'none';
+  document.getElementById('resultsSection').style.display = 'block';
+
+  var borrower = document.getElementById('borrowerName').value;
+  var coBorrower = document.getElementById('coBorrowerName').value;
+  var loanNum = document.getElementById('loanNumber').value;
+  var address = document.getElementById('propertyAddress').value;
+  var dateVal = document.getElementById('analysisDate').value;
+  var dateStr = dateVal ? new Date(dateVal+'T12:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}) : new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var refId = 'HLF-INC-' + Math.random().toString(36).slice(2,7).toUpperCase();
+
+  var loanTypeLabel = {
+    'CONV':'Conventional (FNMA/FHLMC)',
+    'FHA':'FHA / HUD',
+    'VA':'VA / VA Handbook',
+    'JUMBO':'Jumbo / Portfolio',
+    'NON-QM':'Non-QM — ' + {
+      '12mo-personal':'12-Mo Personal Bank Stmts',
+      '24mo-personal':'24-Mo Personal Bank Stmts',
+      '12mo-business':'12-Mo Business Bank Stmts',
+      '24mo-business':'24-Mo Business Bank Stmts',
+      'dscr':'DSCR'
+    }[NONQM_TYPE]
+  }[LOAN_TYPE] || LOAN_TYPE;
+
+  var isDSCR = LOAN_TYPE === 'NON-QM' && NONQM_TYPE === 'dscr';
+  var totalMonthly = d.totalQualifyingMonthlyIncome || 0;
+  var totalAnnual = d.totalQualifyingAnnualIncome || (totalMonthly * 12);
+
+  var html = '';
+
+  // HEADER
+  html += '<div class="ws-header">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:flex-start">';
+  html += '<div><div class="ws-co">Homeland Financial Network, Inc.</div><div class="ws-co-sub">NMLS #390249 · Licensed Mortgage Lender · Internal Use Only</div></div>';
+  html += '<div style="text-align:right"><div style="font-size:18px;font-weight:900;color:#fff;letter-spacing:-.5px">INCOME ANALYSIS</div><div style="font-size:10px;color:rgba(255,255,255,0.45);font-family:DM Mono,monospace;letter-spacing:.5px">WORKSHEET</div></div>';
+  html += '</div>';
+  html += '<div class="ws-meta">';
+  html += '<div class="ws-meta-item"><div class="ws-meta-lbl">Borrower</div><div class="ws-meta-val">'+(d.borrowerName||borrower)+(coBorrower?' / '+coBorrower:'')+'</div></div>';
+  html += '<div class="ws-meta-item"><div class="ws-meta-lbl">Loan Number</div><div class="ws-meta-val">'+(loanNum||'N/A')+'</div></div>';
+  html += '<div class="ws-meta-item"><div class="ws-meta-lbl">Loan Type</div><div class="ws-meta-val">'+loanTypeLabel+'</div></div>';
+  html += '<div class="ws-meta-item"><div class="ws-meta-lbl">Prepared By / Date</div><div class="ws-meta-val">'+LO_NAME+' · '+dateStr+'</div></div>';
+  if (address) html += '<div class="ws-meta-item" style="grid-column:span 2"><div class="ws-meta-lbl">Subject Property</div><div class="ws-meta-val">'+address+'</div></div>';
+  html += '</div>';
+  html += '</div>';
+
+  // TOTAL BAR
+  if (isDSCR) {
+    var dscr = d.dscrRatio || (d.rentalProperties && d.rentalProperties[0] ? d.rentalProperties[0].dscrRatio : 0);
+    var dscrColor = dscr >= 1.25 ? '#059669' : dscr >= 1.0 ? '#d97706' : '#dc2626';
+    html += '<div class="ws-total-bar">';
+    html += '<div><div class="ws-total-lbl">DSCR Ratio</div><div class="ws-total-val" style="color:'+dscrColor+'">'+parseFloat(dscr||0).toFixed(3)+'</div><div class="ws-total-sub">'+(dscr>=1.25?'✅ Strong — Excellent qualification':dscr>=1.0?'⚠ Eligible — meets minimum threshold':'❌ Below minimum — review required')+'</div></div>';
+    html += '<div style="text-align:right"><span class="ws-badge ws-badge-blue">DSCR LOAN · NO PERSONAL INCOME</span></div>';
+    html += '</div>';
+  } else {
+    html += '<div class="ws-total-bar">';
+    html += '<div><div class="ws-total-lbl">Total Qualifying Monthly Income</div><div class="ws-total-val">'+fmt(totalMonthly)+'<span style="font-size:16px;font-weight:500;color:var(--mist)">/mo</span></div><div class="ws-total-sub">'+fmt(totalAnnual)+'/year · Analyzed per '+loanTypeLabel+' guidelines</div></div>';
+    if (d.proposedPITIA > 0 || document.getElementById('proposedPITIA').value) {
+      var pitia = parseFloat(d.proposedPITIA || document.getElementById('proposedPITIA').value || 0);
+      var feDTI = totalMonthly > 0 ? (pitia/totalMonthly*100).toFixed(1) : 0;
+      var beDTI = d.backEndDTI || feDTI;
+      html += '<div style="text-align:right"><div style="font-size:10px;color:var(--mist);font-family:DM Mono,monospace;letter-spacing:.5px;margin-bottom:4px">PROPOSED PITIA</div><div style="font-size:20px;font-weight:800;color:var(--navy)">'+fmt(pitia)+'/mo</div><div style="font-size:11px;color:var(--slate);margin-top:4px">Front-End DTI: <b style="color:'+(parseFloat(feDTI)<=28?'var(--green)':'var(--amber)')+'">'+feDTI+'%</b> &nbsp;·&nbsp; Back-End DTI: <b style="color:'+(parseFloat(beDTI)<=43?'var(--green)':'var(--red)')+'">'+parseFloat(beDTI).toFixed(1)+'%</b></div></div>';
+    }
+    html += '</div>';
+  }
+
+  // INCOME SOURCES
+  if (!isDSCR && d.incomeSources && d.incomeSources.length) {
+    d.incomeSources.forEach(function(src){
+      html += '<div class="ws-section">';
+      html += '<div class="ws-section-title">'+src.sourceType+(src.employerOrSource?' — '+src.employerOrSource:'')+'</div>';
+      html += '<table class="income-table">';
+      html += '<thead><tr><th style="width:35%">Income Item</th><th style="width:17%">'+((src.incomeItems&&src.incomeItems[0]&&src.incomeItems[0].year1Label)||'Year 1')+'</th><th style="width:17%">'+((src.incomeItems&&src.incomeItems[0]&&src.incomeItems[0].year2Label)||'Year 2')+'</th><th style="width:20%">Calculation</th><th style="width:11%">Monthly</th></tr></thead>';
+      html += '<tbody>';
+      if (src.incomeItems) {
+        src.incomeItems.forEach(function(item){
+          var rowClass = !item.included ? 'style="opacity:.5;text-decoration:line-through"' : '';
+          html += '<tr '+rowClass+'>';
+          html += '<td class="td-label">'+(item.label||'')+(item.notes?'<div class="td-note">'+item.notes+'</div>':'')+'</td>';
+          html += '<td class="td-calc">'+(item.year1Amount?fmt(item.year1Amount):'—')+'</td>';
+          html += '<td class="td-calc">'+(item.year2Amount?fmt(item.year2Amount):'—')+'</td>';
+          html += '<td class="td-calc" style="font-size:10px">'+(item.calculation||'')+'</td>';
+          html += '<td class="td-amount '+(item.included&&item.monthlyAmount>0?'green':'')+'">'+(!item.included?'Excluded':fmt(item.monthlyAmount))+'</td>';
+          html += '</tr>';
+        });
+      }
+      html += '<tr class="subtotal-row"><td class="td-label" colspan="4">Subtotal — '+src.sourceType+'</td><td class="td-amount green">'+fmt(src.subtotalMonthly)+'</td></tr>';
+      html += '</tbody></table>';
+      if (src.notes) html += '<div style="padding:8px 10px;background:rgba(37,99,235,0.04);border-radius:7px;margin-top:10px;font-size:11px;color:var(--slate)"><b style="color:var(--blue)">Note:</b> '+src.notes+'</div>';
+      html += '</div>';
+    });
+  }
+
+  // RENTAL PROPERTIES
+  if (d.rentalProperties && d.rentalProperties.length) {
+    html += '<div class="ws-section">';
+    html += '<div class="ws-section-title">'+(isDSCR?'DSCR Analysis':'Rental Income — Schedule E')+'</div>';
+    html += '<table class="income-table">';
+    html += '<thead><tr><th>Property</th><th>Gross Rent</th><th>PITIA</th><th>Method/Calculation</th><th>'+(isDSCR?'DSCR':'Net Income')+'</th></tr></thead>';
+    html += '<tbody>';
+    d.rentalProperties.forEach(function(prop){
+      var dscr = prop.dscrRatio || (prop.pitia > 0 ? (prop.grossRent/prop.pitia).toFixed(3) : '—');
+      var dscrColor = parseFloat(dscr) >= 1.25 ? 'var(--green)' : parseFloat(dscr) >= 1.0 ? 'var(--amber)' : 'var(--red)';
+      html += '<tr>';
+      html += '<td class="td-label">'+(prop.address||'Rental Property')+'<div class="td-note">'+prop.method+'</div></td>';
+      html += '<td class="td-calc">'+fmt(prop.grossRent)+'/mo</td>';
+      html += '<td class="td-calc">'+fmt(prop.pitia)+'/mo</td>';
+      html += '<td class="td-calc" style="font-size:10px">'+(prop.calculation||'')+'</td>';
+      html += '<td class="td-amount" style="color:'+dscrColor+'">'+(isDSCR?dscr:fmt(prop.netRentalIncome))+'</td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    html += '</div>';
+  }
+
+  // GRAND TOTAL
+  if (!isDSCR) {
+    html += '<div class="ws-section">';
+    html += '<table class="income-table"><tbody>';
+    html += '<tr class="grand-total-row"><td class="td-label" colspan="4" style="font-size:14px;font-weight:800;color:var(--navy)">TOTAL QUALIFYING MONTHLY INCOME</td><td class="td-amount green" style="font-size:18px">'+fmt(totalMonthly)+'</td></tr>';
+    html += '<tr><td class="td-label td-note" colspan="4">Annual Equivalent</td><td class="td-calc td-amount" style="font-size:13px">'+fmt(totalAnnual)+'/yr</td></tr>';
+    html += '</tbody></table>';
+    html += '</div>';
+  }
+
+  // INCOME FLAGS
+  if (d.incomeFlags && d.incomeFlags.length) {
+    html += '<div class="ws-section" style="background:rgba(220,38,38,0.02)">';
+    html += '<div class="ws-section-title" style="color:var(--red)">⚠ Income Flags — Underwriter Attention Required</div>';
+    d.incomeFlags.forEach(function(flag){
+      html += '<div style="display:flex;gap:8px;padding:6px 0;font-size:12px;color:var(--red);border-bottom:1px solid rgba(220,38,38,0.08)"><span>⚠</span><span>'+flag+'</span></div>';
+    });
+    html += '</div>';
+  }
+
+  // DOCUMENTS REVIEWED
+  html += '<div class="ws-notes">';
+  if (d.underwriterNotes) {
+    html += '<div class="ws-notes-title">Underwriter Notes</div>';
+    html += '<div class="ws-notes-body">'+d.underwriterNotes+'</div>';
+  }
+  if (d.documentsReviewed && d.documentsReviewed.length) {
+    html += '<div class="ws-docs"><div class="ws-docs-title">Documents Reviewed</div>';
+    d.documentsReviewed.forEach(function(doc){
+      html += '<div class="ws-doc-item"><span>📎</span>'+doc+'</div>';
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // FOOTER
+  html += '<div class="ws-footer">';
+  html += '<div class="ws-footer-left">Prepared by: <b>'+LO_NAME+'</b> · Homeland Financial Network, Inc.<br>Analysis powered by Max AI · Ref: '+refId+'</div>';
+  html += '<div class="ws-footer-right">'+dateStr+'<br>NMLS #390249 · Internal Use Only</div>';
+  html += '</div>';
+  html += '<div class="ws-disclaimer">This income analysis worksheet is for internal loan officer use only. Income calculations are based on AI analysis of provided documents and are subject to underwriter review and approval. All income must be independently verified per applicable agency guidelines. This document does not constitute a commitment to lend.</div>';
+
+  document.getElementById('worksheet').innerHTML = html;
+  document.getElementById('resultsSection').scrollIntoView({ behavior:'smooth' });
+}
+
+function fmt(n){ return '$'+Math.round(n||0).toLocaleString('en-US'); }
+
+function startOver() {
+  FILES = [];
+  document.getElementById('pillsWrap').innerHTML = '';
+  document.getElementById('borrowerName').value = '';
+  document.getElementById('coBorrowerName').value = '';
+  document.getElementById('loanNumber').value = '';
+  document.getElementById('propertyAddress').value = '';
+  document.getElementById('proposedPITIA').value = '';
+  document.getElementById('resultsSection').style.display = 'none';
+  document.getElementById('inputSection').style.display = 'block';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
